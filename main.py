@@ -36,4 +36,7 @@ def poll(room: str, after: float = 0):
         if m["room"] == room and m["ts"] > after
     ]
 
+import threading, time
+threading.Thread(target=lambda: time.sleep(10**9), daemon=False).start()
+
 
