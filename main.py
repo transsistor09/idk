@@ -8,6 +8,8 @@ MESSAGES = []
 MAX_MESSAGES = 200
 
 @app.get("/")
+def root():
+    return {"status": "ok"}
 
 class Message(BaseModel):
     room: str
@@ -29,5 +31,3 @@ def poll(room: str, after: float = 0):
         m for m in MESSAGES
         if m["room"] == room and m["ts"] > after
     ]
-
-
