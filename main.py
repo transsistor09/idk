@@ -10,8 +10,7 @@ MAX_MESSAGES = 200
 
 @app.get("/")
 def root():
-    return {"status": "ok"}
-
+    return "ok"
 
 class Message(BaseModel):
     user: str
@@ -31,4 +30,5 @@ def send(msg: Message):
 @app.get("/poll")
 def poll(after: float = 0):
     return [m for m in MESSAGES if m["ts"] > after]
+
 
