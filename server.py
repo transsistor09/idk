@@ -7,7 +7,6 @@ import uvicorn
 app = FastAPI()
 connections = []
 
-# Allow any origin for WebSocket / CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,7 +16,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"status": "ok"}  # prevents 499 on GET /
+    return {"status": "ok"}
 
 @app.websocket("/ws")
 async def chat(ws: WebSocket):
@@ -26,7 +25,6 @@ async def chat(ws: WebSocket):
     try:
         while True:
             data = await ws.receive_text()
-            # Broadcast to all except sender
             for conn in connections:
                 if conn != ws:
                     await conn.send_text(data)
@@ -34,5 +32,7 @@ async def chat(ws: WebSocket):
         connections.remove(ws)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))  # Railway sets PORT automatically
+    port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
+
+
