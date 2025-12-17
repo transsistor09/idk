@@ -10,11 +10,10 @@ MAX_MESSAGES = 200
 
 @app.get("/")
 def root():
-    return {"status": "ok"}   # <- REQUIRED for Railway
+    return {"status": "ok"}
 
 
 class Message(BaseModel):
-    room: str
     user: str
     payload: str
     ts: float | None = None
@@ -30,13 +29,6 @@ def send(msg: Message):
 
 
 @app.get("/poll")
-def poll(room: str, after: float = 0):
-    return [
-        m for m in MESSAGES
-        if m["room"] == room and m["ts"] > after
-    ]
-
-import threading, time
-threading.Thread(target=lambda: time.sleep(10**9), daemon=False).start()
-
+def poll(after: float = 0):
+    return [m for m in MESSAGES if m["ts"] > after]
 
