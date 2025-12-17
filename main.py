@@ -7,15 +7,18 @@ app = FastAPI()
 MESSAGES = []
 MAX_MESSAGES = 200
 
+
 @app.get("/")
 def root():
-    return {"status": "ok"}
+    return {"status": "ok"}   # <- REQUIRED for Railway
+
 
 class Message(BaseModel):
     room: str
     user: str
     payload: str
     ts: float | None = None
+
 
 @app.post("/send")
 def send(msg: Message):
@@ -25,9 +28,12 @@ def send(msg: Message):
         MESSAGES.pop(0)
     return {"ok": True}
 
+
 @app.get("/poll")
 def poll(room: str, after: float = 0):
     return [
         m for m in MESSAGES
         if m["room"] == room and m["ts"] > after
     ]
+
+
