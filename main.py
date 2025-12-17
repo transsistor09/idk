@@ -7,6 +7,8 @@ app = FastAPI()
 MESSAGES = []
 MAX_MESSAGES = 200
 
+@app.get("/")
+
 class Message(BaseModel):
     room: str
     user: str
@@ -27,4 +29,5 @@ def poll(room: str, after: float = 0):
         m for m in MESSAGES
         if m["room"] == room and m["ts"] > after
     ]
+
 
