@@ -1,38 +1,30 @@
-# server.py
-import os
-from fastapi import FastAPI, WebSocket
-from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
+from fastapi import FastAPI
+from pydantic import BaseModel
+import time
 
 app = FastAPI()
-connections = []
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+MESSAGES = []
+MAX_MESSAGES = 200
 
-@app.get("/")
-async def root():
-    return {"status": "ok"}
+class Message(BaseModel):
+    room: str
+    user: str
+    payload: str
+    ts: float | None = None
 
-@app.websocket("/ws")
-async def chat(ws: WebSocket):
-    await ws.accept()
-    connections.append(ws)
-    try:
-        while True:
-            data = await ws.receive_text()
-            for conn in connections:
-                if conn != ws:
-                    await conn.send_text(data)
-    except:
-        connections.remove(ws)
+@app.post("/send")
+def send(msg: Message):
+    msg.ts = time.time()
+    MESSAGES.append(msg.dict())
+    if len(MESSAGES) > MAX_MESSAGES:
+        MESSAGES.pop(0)
+    return {"ok": True}
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
-
+@app.get("/poll")
+def poll(room: str, after: float = 0):
+    return [
+        m for m in MESSAGES
+        if m["room"] == room and m["ts"] > after
+    ]
 
